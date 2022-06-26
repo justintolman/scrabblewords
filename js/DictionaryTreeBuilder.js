@@ -60,7 +60,7 @@ async function generateTree(path, file_name, new_name) {
 
 		await events.once(rl, 'close');
 
-		fs.writeFile(`../trees/${new_name||file_name}.js`, `export default ${JSON.stringify(tree)}`, function (err) {
+		fs.writeFileSync(`../trees/${new_name||file_name}.js`, `export default ${JSON.stringify(tree)}`, function (err) {
 			if (err) return console.log(err);
 			console.log('Tree built.');
 		});
