@@ -1,0 +1,23 @@
+Use Node.js to un DictionaryTreeBuilder.js to generate a dictionary tree.
+Follow the prompts to select a language, source dictionary, and optionally a
+more user friendly file name. (For my application I'm using underscores instead
+of spaces.)
+
+For the sake of file size and speed the trees only verify if the input is a word
+or not, but DictionaryTreeBuilder.js could be modified to return a definition.
+
+TreeList.js is also generated with a list of trees in the folder.
+
+Example of tree usage:
+import Dict from 'path/to/tree/US_English'
+isWord(str){
+  let ptr = Dict;
+  for(let ch of str){
+    let c = ch.toUpperCase();
+    if(ptr[c])ptr = ptr[c];
+    else return false;
+  }
+  return ptr['#']?true:false;
+}
+isWord('potato')//true
+isWord('otatop')//false

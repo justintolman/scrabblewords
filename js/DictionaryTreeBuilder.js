@@ -7,26 +7,32 @@ const ipt = readline.createInterface({
   output: process.stdout
 });
 
-let langs = fs.readdirSync("../words/", { withFileTypes: true }).filter(dirent => dirent.isDirectory());
-let i;
-for (i in langs) {
-	console.log(`${parseInt(i) + 1}) ${langs[i].name}`);
-}
+selectFile();
+// generateList();
 
-ipt.question(`Select a language. [1-${parseInt(i) + 1}]: `, function (lang) {
-	let path = `../words/${langs[lang-1].name}/`;
-	let dicts = fs.readdirSync(path, { withFileTypes: true }).filter(dirent => !dirent.name.includes("-") && dirent.name.slice(-4) === ".txt");
-	for (i in dicts) {
-		console.log(`${parseInt(i) + 1}) ${dicts[i].name}`);
+function selectFile(){
+	let langs = fs.readdirSync("../words/", { withFileTypes: true }).filter(dirent => dirent.isDirectory());
+	let i;
+	for (i in langs) {
+		console.log(`${parseInt(i) + 1}) ${langs[i].name}`);
 	}
-  ipt.question(`Select a dictionary. [1-${i + 1}]: `, function (dict) {
-		let file_name = dicts[dict-1].name;
-	  ipt.question(`Enter a new name for the file. (Optional): `, async function (new_name) {
-			await generateTree(path, file_name.slice(0,-4), new_name);
-	    ipt.close();
+
+	ipt.question(`Select a language. [1-${parseInt(i) + 1}]: `, function (lang) {
+		let path = `../words/${langs[lang-1].name}/`;
+		let dicts = fs.readdirSync(path, { withFileTypes: true }).filter(dirent => !dirent.name.includes("-") && dirent.name.slice(-4) === ".txt");
+		for (i in dicts) {
+			console.log(`${parseInt(i) + 1}) ${dicts[i].name}`);
+		}
+	  ipt.question(`Select a dictionary. [1-${i + 1}]: `, function (dict) {
+			let file_name = dicts[dict-1].name;
+		  ipt.question(`Enter a new name for the file. (Optional): `, async function (new_name) {
+				await generateTree(path, file_name.slice(0,-4), new_name);
+				await generateList();
+		    ipt.close();
+		  });
 	  });
-  });
-});
+	});
+}
 
 ipt.on('close', function () {
   process.exit(0);
@@ -34,7 +40,6 @@ ipt.on('close', function () {
 
 
 async function generateTree(path, file_name, new_name) {
-	console.log(path, file_name, new_name);
 	try {
 		const rl = readline.createInterface({
 			input: fs.createReadStream(`${path + file_name}.txt`),
@@ -69,4 +74,19 @@ async function generateTree(path, file_name, new_name) {
 	} catch (err) {
 		console.error(err);
 	}
+}
+
+async function generateList() {
+		let fileList = fs.readdirSync("../trees/");
+		let output = 'export default ['
+		console.log(fileList);
+		fileList.map(file => {
+			if(file.name === "TreeList.js") return false;
+			output += `\n\t{ lang: '${file.replace(/_/g,' ').slice(0,-3)}', file: '${file}' },`;
+		});
+		output += '\n]';
+
+		fs.writeFileSync(`../trees/TreeList.js`, output, function (err) {
+			if (err) return console.log(err);
+		});
 }
